@@ -17,11 +17,10 @@ export default {
   
 <style scoped>
 .side-menu {
-    width: 200px;
     background-color: #f4f4f4;
     padding: 1rem;
-    position: relative;
     height: 79vh;
+    grid-area: sidebar;
 }
 .side-menu ul {
     list-style: none;

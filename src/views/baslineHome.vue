@@ -1,5 +1,5 @@
 <template>
-    <div class="content">
+    <div>
       <h2>Welcome to the Home Page</h2>
     </div>
 </template>
@@ -7,9 +7,6 @@
 <script>
 export default {
     name: 'baslineHome',
-    mounted() {
-      console.log(123)
-    },
 };
 </script>
 

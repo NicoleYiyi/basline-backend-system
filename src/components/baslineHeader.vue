@@ -16,6 +16,7 @@ export default {
     color: white;
     padding: 1rem;
     text-align: center;
+    grid-area: header;
 }
 </style>
   

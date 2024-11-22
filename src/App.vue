@@ -1,5 +1,5 @@
 <template>
-  <div id="app">
+  <div id="baslineapp">
     <Header />
     <SideMenu />
     <main class="content">
@@ -25,13 +25,17 @@ export default {
 </script>
 
 <style>
-#app {
-  display: flex;
-  flex-direction: column;
+#baslineapp {
+  display: grid;
+  grid-template-areas: 
+  'header header'
+  'sidebar content'
+  'footer footer';
+  grid-template-columns: 1fr 5fr;
 }
 .content {
-  margin-left: 200px; /* Offset by SideMenu width */
   padding: 1rem;
   flex-grow: 1;
+  grid-area: content;
 }
 </style>
