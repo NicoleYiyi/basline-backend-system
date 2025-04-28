@@ -1,6 +1,6 @@
 <template>
     <footer class="footer">
-      <p>&copy; Basline</p>
+      <p>&copy; BASlinE</p>
     </footer>
 </template>
 
