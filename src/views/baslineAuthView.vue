@@ -18,6 +18,7 @@
   import RegisterForm from '@/components/baslineRegisterForm.vue'
   
   const activeTab = ref('login')
+  
   </script>
   <script>
   export default {

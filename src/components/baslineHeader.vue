@@ -1,6 +1,6 @@
 <template>
     <header class="header">
-      <h1>BASlinE 後台系統</h1>
+      <a href="/"><h1>BASlinE 後台系統</h1></a>
       <a href="/auth"><button>Account</button></a>
     </header>
 </template>
@@ -16,7 +16,6 @@ export default {
     background-color: #333;
     color: white;
     padding: 1rem;
-    text-align: center;
     grid-area: header;
     display: grid;
     grid-template-columns: 1fr auto;
@@ -37,6 +36,11 @@ button{
     color: #fff;
     border: 1px solid #fff;
     cursor: pointer;
+}
+a{
+    color:#fff;
+    text-decoration: none;
+    width:fit-content;
 }
 </style>
   

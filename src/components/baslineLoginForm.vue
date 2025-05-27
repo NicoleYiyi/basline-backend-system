@@ -14,7 +14,7 @@
   
   <script setup>
   import { reactive } from 'vue'
-  
+
   const form = reactive({
     email: '',
     password: ''
