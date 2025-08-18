@@ -1,6 +1,6 @@
 <template>
     <header class="header">
-      <a href="/"><h1>BASlinE 後台系統</h1></a>
+      <a href="/"><img class="header-logo" src="/images/Basline-LOGO-01.svg" alt="Basline logo"><h1>BASlinE 後台系統</h1></a>
       <a href="/auth"><button>Account</button></a>
     </header>
 </template>
@@ -21,9 +21,16 @@ export default {
     grid-template-columns: 1fr auto;
     align-items: center;
 }
+.header-logo{
+    width: 40px;
+    display: inline;
+    float: left;
+    margin: 0 10px 0 0;
+}
 h1{
     font-size: 32px;
     line-height: 120%;
+    margin:0;
 }
 button{
     width: fit-content;
@@ -40,7 +47,6 @@ button{
 a{
     color:#fff;
     text-decoration: none;
-    width:fit-content;
 }
 </style>
   

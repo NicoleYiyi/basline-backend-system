@@ -1,7 +1,13 @@
 <template>
     <div>
       <h2>教室清單</h2>
-      <button class="addbtn">新增教室</button>
+      <button class="addbtn" @click="showPopup = true">新增教室</button>
+      <BaslinePopup v-model="showPopup">
+        <h3>新增教室</h3>
+        <h5>教室名稱： {{ message }}<input v-model="message" placeholder="教室名稱" /></h5>
+        <h5>所屬會館： {{ message }}<input v-model="message" placeholder="會館名稱" /></h5>
+        <h5>可容納名額： {{ message }}<input v-model="message" placeholder="可容納名額(5-100)" /></h5>
+      </BaslinePopup>
       <table>
         <tr>
             <th><h4>教室名稱</h4></th>
@@ -21,6 +27,13 @@
 export default {
     name: 'baslineClassroomlist',
 };
+</script>
+
+<script setup>
+import { ref } from 'vue'
+import BaslinePopup from '@/components/baslinePopup.vue';
+
+const showPopup = ref(false)
 </script>
 
 <style scoped>

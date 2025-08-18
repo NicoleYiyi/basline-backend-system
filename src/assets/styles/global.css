@@ -28,3 +28,15 @@ table {
     border-radius: 5px;
     margin-bottom: 15px;
 }
+h5{
+    font-size:16px;
+    font-weight:400;
+    margin:0;
+    line-height: 200%;
+}
+.image-upload {
+  padding: 20px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  max-width: 400px;
+}
