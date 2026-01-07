@@ -4,7 +4,26 @@
       <button class="addbtn" @click="openAddPopup('class')">新增課程</button>
       <button class="addbtn" @click="downloadClassesJson">下載課程 JSON</button>
       <input type="file" @change="uploadClassesJson" accept=".json" style="margin-left:10px" />
-      <BaslinePopup v-model="showPopup">
+      <table>
+        <tr>
+            <th><h4>圖片</h4></th>
+            <th><h4>課程名稱</h4></th>
+            <th><h4>課程類型</h4></th>
+            <th><h4>會員端顯示</h4></th>
+            <th><h4>操作</h4></th>
+        </tr>
+        <tr v-for="m in classes" :key="m.id">
+            <td><img v-if="m.photo" :src="m.photo" alt="課程圖片" style="max-width: 80px; max-height: 80px;" /></td>
+            <td>{{ m.name }}</td>
+            <td>{{ m.type }}</td>
+            <td>{{ m.show ? '顯示' : '隱藏' }}</td>
+            <td>
+              <button @click="openEditPopup('class', m)">編輯</button>
+              <button @click="requestDelete(m.id)" style="margin-left: 5px;">刪除</button>
+            </td>
+        </tr>
+      </table>
+      <BaslinePopup v-model="showPopup" :onSave="saveClass">
         <h3>{{ actionType === 'add' ? '新增課程' : '編輯課程' }}</h3>
         <h5>課程類型：
         <select v-model="formData.type">
@@ -23,37 +42,13 @@
         <h5>課程介紹：</h5>
         <p style="white-space: pre-line;">
         <textarea v-model="formData.note" placeholder="課程介紹"></textarea></p>
-
-        <div style="margin-top: 15px;">
-          <button @click="saveClass">儲存</button>
-          <button @click="closePopup">取消</button>
-        </div>
-
+        <h5>會員端顯示： 
+          <label class="switch">
+            <input type="checkbox" v-model="formData.show" />
+            <span class="slider"></span>
+          </label>
+        </h5>
       </BaslinePopup>
-      <table>
-        <tr>
-            <th><h4>圖片</h4></th>
-            <th><h4>課程名稱</h4></th>
-            <th><h4>課程類型</h4></th>
-            <th><h4>會員端顯示</h4></th>
-            <th><h4>操作</h4></th>
-        </tr>
-        <tr v-for="m in classes" :key="m.id">
-            <td><img v-if="m.photo" :src="m.photo" alt="課程圖片" style="max-width: 80px; max-height: 80px;" /></td>
-            <td>{{ m.name }}</td>
-            <td>{{ m.type }}</td>
-            <td>4</td>
-            <td>
-              <button @click="openEditPopup('class', m)">編輯</button>
-              <button @click="requestDelete(m.id)" style="margin-left: 5px;">刪除</button>
-            </td>
-        </tr>
-      </table>
-      <div v-if="confirmDelete" class="confirm-box">
-        <p>確定要刪除嗎？</p>
-        <button @click="confirmDeleteAction(deleteClass)">確定</button>
-        <button @click="cancelDelete">取消</button>
-      </div>
     </div>
 </template>
 
@@ -64,14 +59,10 @@ export default {
 </script>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useCrudPopup} from '@/composables/useCrudPopup';
 import BaslinePopup from '@/components/baslinePopup.vue';
-
-// const showPopup = ref(false)
-// const previewUrl = ref(null)
-// const isEditing = ref(false)       // 是否在編輯模式
-// const editingIndex = ref(null)     // 目前編輯的課程索引
+import { fetchCourseTemplates } from '@/api/baslineApi';
 
 //課程清單
 const classes = ref([])
@@ -82,38 +73,72 @@ const {
   actionType,
   formData,
   previewUrl, // ← 從 useCrudPopup 取得
-  confirmDelete,
+  // confirmDelete,
   openAddPopup,
   openEditPopup,
   closePopup,
-  requestDelete,
+  // requestDelete,
   cancelDelete,
-  confirmDeleteAction,
+  // confirmDeleteAction,
   saveToJson,
   loadFromJson
 } = useCrudPopup()
 
+// 從 API 載入課程資料
+async function loadClasses() {
+  try {
+    const result = await fetchCourseTemplates()
+    console.log('課程 API 資料：', result)
+
+    // 使用 result.data（這才是陣列）
+    classes.value = result.data.map(t => ({
+      id: t.id,
+      name: t.name || '',
+      type: t.type || '',
+      photo: t.image_url || '',
+      note: t.description || '',
+      is_visible: t.show === 1
+    }))
+  } catch (error) {
+    console.error('載入課程失敗:', error)
+    alert('無法從伺服器載入課程資料')
+  }
+}
+
 function saveClass() {
+  console.log('test');
   if (!formData.type || !formData.name || !formData.note) {
     alert('請輸入課程資料')
     return
   }
   if (actionType.value === 'add') {
-    classes.value.push({ ...formData, id: Date.now() })
+    classes.value.push({ ...formData, id: Date.now(), show: formData.show ?? false })
   } else {
     const idx = classes.value.findIndex(m => m.id === formData.id)
-    if (idx !== -1) classes.value[idx] = { ...formData }
+    if (idx !== -1) classes.value[idx] = { ...formData, show: formData.show ?? false }
   }
   closePopup()
 }
 
+function requestDelete(id) {
+  const confirmed = window.confirm('確定要刪除嗎？')
+  if (confirmed) {
+    deleteClass(id)
+  }
+}
+
 function deleteClass(id) {
   classes.value = classes.value.filter(m => m.id !== id)
+  cancelDelete();
 }
 
 // 下載會員 JSON 檔
 function downloadClassesJson() {
-  saveToJson(classes.value, 'classes.json')
+  const exportData = classes.value.map(t => ({
+    ...t,
+    show: t.show ? '顯示' : '隱藏'
+  }))
+  saveToJson(exportData, 'classes.json')
 }
 
 // 上傳並載入會員 JSON 檔
@@ -121,7 +146,11 @@ async function uploadClassesJson(event) {
   try {
     const loadedData = await loadFromJson(event)
     if (Array.isArray(loadedData)) {
-      classes.value = loadedData
+      classes.value = loadedData.map(t => ({
+        ...t,
+        // 確保 show 轉成布林
+        show: t.show === true || t.show === '顯示'
+      }))
     } else {
       alert('JSON 格式錯誤，預期為陣列')
     }
@@ -129,20 +158,6 @@ async function uploadClassesJson(event) {
     alert(e)
   }
 }
-
-//表單資料 (包含photo欄位)
-// const formData = ref({
-//   photo: '', //Base64 圖片
-//   name: '',
-//   type: ''
-// })
-
-//開啟新增課程彈窗
-// function openAddPopup() {
-//   resetForm()
-//   isEditing.value = false
-//   showPopup.value = true
-// }
 
 //處理圖片轉 Base64
 function onFileChange(event) {
@@ -161,62 +176,10 @@ function onFileChange(event) {
   }
 }
 
-//編輯課程
-// function editClass(index) {
-//   const danceclass = classes.value[index]
-//   formData.value = { ...danceclass } //帶入原資料
-//   previewUrl.value = danceclass.photo || null
-//   isEditing.value = true
-//   editingIndex.value = index
-//   showPopup.value = true
-// }
+onMounted(() => {
+  loadClasses()
+})
 
-//更新課程
-// function updateClass() {
-//   if (editingIndex.value !== null) {
-//     classes.value[editingIndex.value] = { ...formData.value }
-//     resetForm()
-//     isEditing.value = false
-//     editingIndex.value = null
-//     showPopup.value = false
-//   }
-// }
-
-//刪除會員
-// function deleteClass(index) {
-//   if (confirm(`確定要刪除課程「${classes.value[index].name}」嗎？`)) {
-//     classes.value.splice(index, 1)
-//   }
-// }
-
-//重置表單
-// function resetForm() {
-//   formData.value = {
-//     photo: '',
-//     name: '',
-//     type: ''
-//   }
-//   previewUrl.value = null
-// }
-
-//下載 JSON 檔
-// function saveToJson() {
-//   if (classes.value.length === 0) {
-//     alert('目前沒有任何課程資料可下載')
-//     return
-//   }
-
-  // const dataStr = JSON.stringify(classes.value, null, 2)
-  // const blob = new Blob([dataStr], { type: "application/json" })
-  // const url = URL.createObjectURL(blob)
-
-  // const a = document.createElement('a')
-  // a.href = url
-  // a.download = 'classes.json'
-  // a.click()
-
-  // URL.revokeObjectURL(url)
-// }
 </script>
 
 <style scoped>
@@ -232,4 +195,50 @@ h4{
     margin:0;
     color:#fff;
 }
+/* switch 樣式 */
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 50px;
+  height: 26px;
+}
+
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  transition: 0.3s;
+  border-radius: 26px;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 20px;
+  width: 20px;
+  left: 3px;
+  bottom: 3px;
+  background-color: white;
+  transition: 0.3s;
+  border-radius: 50%;
+}
+
+input:checked + .slider {
+  background-color: #4caf50;
+}
+
+input:checked + .slider:before {
+  transform: translateX(24px);
+}
+
 </style>
