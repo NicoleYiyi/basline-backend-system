@@ -1,11 +1,11 @@
 <template>
-  <div id="baslineapp">
-    <Header />
-    <SideMenu />
+  <div id="baslineapp" :class="{ 'auth-layout': !showLayout }">
+    <Header v-if="showLayout" />
+    <SideMenu v-if="showLayout" />
     <main class="content">
       <router-view />
     </main>
-    <Footer />
+    <Footer v-if="showLayout" />
   </div>
 </template>
 
@@ -20,6 +20,11 @@ export default {
     Header,
     Footer,
     SideMenu,
+  },
+  computed: {
+    showLayout() {
+      return this.$route.name !== 'baslineAuthView';
+    },
   },
 };
 </script>
@@ -37,5 +42,8 @@ export default {
   padding: 1rem;
   flex-grow: 1;
   grid-area: content;
+}
+#baslineapp.auth-layout {
+  display: block;
 }
 </style>

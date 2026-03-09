@@ -1,8 +1,8 @@
 <template>
     <form @submit.prevent="handleLogin">
       <div>
-        <label for="email">電子郵件：</label>
-        <input v-model="form.email" id="email" type="email" required />
+        <label for="account">帳號：</label>
+        <input v-model="form.account" id="account" type="account" required />
       </div>
       <div>
         <label for="password">密碼：</label>
@@ -16,7 +16,7 @@
   import { reactive } from 'vue'
 
   const form = reactive({
-    email: '',
+    account: '',
     password: ''
   })
   

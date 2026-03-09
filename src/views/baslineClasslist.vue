@@ -4,6 +4,16 @@
       <button class="addbtn" @click="openAddPopup('class')">新增課程</button>
       <button class="addbtn" @click="downloadClassesJson">下載課程 JSON</button>
       <input type="file" @change="uploadClassesJson" accept=".json" style="margin-left:10px" />
+      <label class="filter">
+        課程類型：
+        <select v-model="typeFilter">
+          <option value="all">全部</option>
+          <option value="團體課">團體課</option>
+          <option value="期課">期課</option>
+          <option value="大師課">大師課</option>
+          <option value="私課">私課</option>
+        </select>
+      </label>
       <table>
         <tr>
             <th><h4>圖片</h4></th>
@@ -12,7 +22,7 @@
             <th><h4>會員端顯示</h4></th>
             <th><h4>操作</h4></th>
         </tr>
-        <tr v-for="m in classes" :key="m.id">
+        <tr v-for="m in filteredClasses" :key="m.id">
             <td><img v-if="m.photo" :src="m.photo" alt="課程圖片" style="max-width: 80px; max-height: 80px;" /></td>
             <td>{{ m.name }}</td>
             <td>{{ m.type }}</td>
@@ -59,13 +69,24 @@ export default {
 </script>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { useCrudPopup} from '@/composables/useCrudPopup';
 import BaslinePopup from '@/components/baslinePopup.vue';
-import { fetchCourseTemplates } from '@/api/baslineApi';
+import { fetchClasses } from '@/api/baslineApi';
 
 //課程清單
 const classes = ref([])
+const typeFilter = ref('all')
+
+const filteredClasses = computed(() => {
+  if (typeFilter.value === 'all') return classes.value
+  return classes.value.filter(m => {
+    const type = m.type || ''
+    if (typeFilter.value === '團課') return type === '團課' || type === '團體課'
+    if (typeFilter.value === '一對一') return type === '一對一' || type === '私課'
+    return type === typeFilter.value
+  })
+})
 
 const {
   showPopup,
@@ -87,7 +108,7 @@ const {
 // 從 API 載入課程資料
 async function loadClasses() {
   try {
-    const result = await fetchCourseTemplates()
+    const result = await fetchClasses()
     console.log('課程 API 資料：', result)
 
     // 使用 result.data（這才是陣列）
@@ -194,6 +215,9 @@ th{
 h4{
     margin:0;
     color:#fff;
+}
+.filter{
+  margin-left:10px;
 }
 /* switch 樣式 */
 .switch {
