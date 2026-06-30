@@ -1,12 +1,12 @@
 <template>
-    <div>
-      <h2>Welcome to the Home Page</h2>
-    </div>
+  <div>
+    <h2>Welcome to the Home Page</h2>
+  </div>
 </template>
 
 <script>
 export default {
-    name: 'baslineHome',
+    name: 'BaslineHome',
 };
 </script>
 

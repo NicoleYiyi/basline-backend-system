@@ -1,5 +1,8 @@
 <template>
-  <div id="baslineapp" :class="{ 'auth-layout': !showLayout }">
+  <div
+    id="baslineapp"
+    :class="{ 'auth-layout': !showLayout }"
+  >
     <Header v-if="showLayout" />
     <SideMenu v-if="showLayout" />
     <main class="content">

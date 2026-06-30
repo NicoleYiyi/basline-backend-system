@@ -1,8 +1,8 @@
 import { createRouter, createWebHistory } from 'vue-router';
 import Home from '../views/baslineHome.vue';
 import AuthView from '@/views/baslineAuthView.vue';
-import Groupclass from '@/views/baslineGroupclass.vue';
 import Classlist from '@/views/baslineClasslist.vue';
+import ClassCategorylist from '@/views/baslineClassCategorylist.vue'
 import Teacherlist from '@/views/baslineTeacherlist.vue';
 import Classroomlist from '@/views/baslineClassroomlist.vue';
 import Salesmanagement from '@/views/baslineSalesmanagement.vue';
@@ -13,6 +13,10 @@ import Notification from '@/views/baslineNotification.vue';
 import Plansetting from '@/views/baslinePlansetting.vue';
 import Venuesetting from '@/views/baslineVenuesetting.vue';
 import Generalsetting from '@/views/baslineGeneralsetting.vue';
+import Allclass from '@/views/baslineAllclass.vue';
+import Profile from '@/views/baslineProfile.vue'
+import Ordermanagement from '@/views/baslineOrdermanagement.vue'
+
 
 const routes = [
   {
@@ -21,19 +25,24 @@ const routes = [
     component: Home,
   },
   {
-    path: "/auth",
+    path: "/login",
     name: "baslineAuthView",
     component: AuthView,
   },
   {
-    path: "/groupclass",
-    name: "baslineGroupclass",
-    component: Groupclass,
+    path: "/allclass",
+    name: "baslineAllclass",
+    component: Allclass,
   },
   {
     path: "/classlist",
     name: "baslineClasslist",
     component: Classlist,
+  },
+  {
+    path: "/classcategorylist",
+    name: "baslineClassCategorylist",
+    component: ClassCategorylist,
   },
   {
     path: "/teacherlist",
@@ -85,13 +94,39 @@ const routes = [
     name: "baslineGeneralsetting",
     component: Generalsetting,
   },
-  
+  {
+    path: "/profile",
+    name: "baslineProfile",
+    component: Profile,
+  },
+  {
+    path: "/ordermanagement",
+    name: "baslineOrdermanagement",
+    component: Ordermanagement,
+  },
   // 可以新增其他路徑
 ];
 
 const router = createRouter({
     history: createWebHistory(),
     routes,
+});
+
+router.beforeEach((to) => {
+  const isLoggedIn = Boolean(localStorage.getItem('token'));
+
+  if (to.name === 'baslineAuthView' && isLoggedIn) {
+    return { name: 'baslineHome' };
+  }
+
+  if (to.name !== 'baslineAuthView' && !isLoggedIn) {
+    return {
+      name: 'baslineAuthView',
+      query: { redirect: to.fullPath },
+    };
+  }
+
+  return true;
 });
 
 

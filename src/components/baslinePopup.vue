@@ -1,11 +1,25 @@
 <template>
-    <div v-if="modelValue" class="modal-overlay" @click.self="$emit('update:modelValue', false)">
-      <div class="modal-content">
-        <slot />
-        <button class="close-btn" @click="onSave">儲存</button>
-        <button class="close-btn" @click="$emit('update:modelValue', false)">取消</button>
-      </div>
+  <div
+    v-if="modelValue"
+    class="modal-overlay"
+    @click.self="$emit('update:modelValue', false)"
+  >
+    <div class="modal-content">
+      <slot />
+      <button
+        class="close-btn"
+        @click="onSave"
+      >
+        儲存
+      </button>
+      <button
+        class="close-btn"
+        @click="$emit('update:modelValue', false)"
+      >
+        取消
+      </button>
     </div>
+  </div>
 </template>
   
   <script setup>
